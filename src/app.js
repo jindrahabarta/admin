@@ -16,7 +16,12 @@ const port = env.parsed.PORT
 
 app.use(helmet())
 app.use(bodyParser.json())
-app.use(cors())
+app.use(
+    cors({
+        origin: '*',
+        credentials: true,
+    })
+)
 app.use(morgan('dev'))
 app.use(cookieParser())
 
