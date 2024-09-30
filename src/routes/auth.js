@@ -1,6 +1,6 @@
 import express from 'express'
 import jwt from 'jsonwebtoken'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { configDotenv } from 'dotenv'
 import { User } from '../database/models.js'
 const env = configDotenv()
