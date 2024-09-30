@@ -5,8 +5,10 @@ import { upload } from '../utils/cloudinary.js'
 const router = express.Router()
 
 router.get('/', async (req, res) => {
+    console.log(req.body)
+
     const products = await Product.find()
-    res.json(products)
+    res.send(products)
 })
 
 router.get('/:id', async (req, res) => {

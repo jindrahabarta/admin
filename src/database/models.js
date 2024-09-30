@@ -22,3 +22,15 @@ const productSchema = new mongoose.Schema(
     }
 )
 export const Product = mongoose.model('product', productSchema, 'products')
+
+const categorySchema = new mongoose.Schema(
+    {
+        _id: String,
+        name: String,
+        products: [String],
+    },
+    {
+        versionKey: false,
+    }
+)
+export const Category = mongoose.model('category', categorySchema, 'categories')

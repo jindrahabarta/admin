@@ -1,6 +1,7 @@
 import express from 'express'
 import authRoute from './routes/auth.js'
 import productsRoute from './routes/products.js'
+import categoriesRoute from './routes/categories.js'
 import helmet from 'helmet'
 import bodyParser from 'body-parser'
 import cors from 'cors'
@@ -15,13 +16,18 @@ const port = env.parsed.PORT
 
 app.use(helmet())
 app.use(bodyParser.json())
-app.use(cors())
+app.use(
+    cors({
+        origin: 'http://localhost:5173/products',
+        optionsSuccessStatus: 200,
+    })
+)
 app.use(morgan('dev'))
 app.use(cookieParser())
 
 app.use('/auth', authRoute)
-
 app.use('/products', productsRoute)
+app.use('/categories', categoriesRoute)
 
 const startServer = async () => {
     app.listen(port, () => {
