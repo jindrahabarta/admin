@@ -16,12 +16,7 @@ const port = env.parsed.PORT
 
 app.use(helmet())
 app.use(bodyParser.json())
-app.use(
-    cors({
-        origin: 'http://localhost:5173/products',
-        optionsSuccessStatus: 200,
-    })
-)
+app.use(cors())
 app.use(morgan('dev'))
 app.use(cookieParser())
 
