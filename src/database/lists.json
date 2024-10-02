@@ -1,0 +1,18 @@
+[
+  {
+    "title": "Todos",
+    "id": "todos"
+  },
+  {
+    "title": "In progress",
+    "id": "inprogress"
+  },
+  {
+    "title": "Done",
+    "id": "done"
+  },
+  {
+    "id": "asdfasdf",
+    "title": "asdfasdf"
+  }
+]

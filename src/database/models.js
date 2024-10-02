@@ -13,6 +13,7 @@ const productSchema = new mongoose.Schema(
         _id: String,
         productName: String,
         desc: String,
+        categoryId: String,
         count: Number,
         price: Number,
         imageUrl: String,
@@ -27,7 +28,6 @@ const categorySchema = new mongoose.Schema(
     {
         _id: String,
         name: String,
-        products: [String],
     },
     {
         versionKey: false,

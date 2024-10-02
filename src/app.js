@@ -1,6 +1,8 @@
 import express from 'express'
 import authRoute from './routes/auth.js'
 import productsRoute from './routes/products.js'
+import todosRoute from './routes/todos.js'
+import listsRoute from './routes/lists.js'
 import categoriesRoute from './routes/categories.js'
 import helmet from 'helmet'
 import bodyParser from 'body-parser'
@@ -18,7 +20,7 @@ app.use(helmet())
 app.use(bodyParser.json())
 app.use(
     cors({
-        origin: 'http://localhost:5173',
+        origin: ['http://localhost:5173', 'https://jh-todoapp.netlify.app'],
         credentials: true,
     })
 )
@@ -28,6 +30,8 @@ app.use(cookieParser())
 app.use('/auth', authRoute)
 app.use('/products', productsRoute)
 app.use('/categories', categoriesRoute)
+app.use('/todos', todosRoute)
+app.use('/lists', listsRoute)
 
 const startServer = async () => {
     app.listen(port, () => {

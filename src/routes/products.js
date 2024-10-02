@@ -22,11 +22,11 @@ router.post('/', upload.single('mainImage'), async (req, res) => {
     if (!req.file) {
         return res.status(400)
     }
-
     const newProduct = new Product({
         _id: crypto.randomUUID(),
         productName: req.body.productName,
         desc: req.body.desc,
+        categoryId: req.body.category,
         count: Number(req.body.count),
         price: Number(req.body.price),
         imageUrl: req.file.path,
