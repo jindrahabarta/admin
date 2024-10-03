@@ -31,7 +31,7 @@ router.post('/login', async (req, res) => {
             res.json({
                 jwt: jwtToken,
                 refreshToken,
-                user: { id: user.id, username: user.username },
+                user: { id: user.id, username: user.username, role: user.role },
             })
         } else {
             res.sendStatus(401)
@@ -42,9 +42,11 @@ router.post('/login', async (req, res) => {
 router.post('/authorize', (req, res) => {
     const token = req.headers.authorization.replace('Bearer ', '')
 
-    jwt.verify(token, env.parsed.PRIVATE_KEY, function (err, verified) {
+    jwt.verify(token, env.parsed.PRIVATE_KEY, async function (err, verified) {
         if (verified) {
-            res.status(200).json({ username: verified.username })
+            const user = await User.findOne({ username: verified.username })
+
+            res.json({ username: verified.username, role: user.role })
         } else {
             res.sendStatus(401)
         }
@@ -55,19 +57,20 @@ router.post('/refresh', (req, res) => {
     jwt.verify(
         req.body.refreshToken,
         env.parsed.REFRESH_TOKEN_SECRET,
-        function (err, verified) {
+        async function (err, verified) {
             if (verified) {
                 const userData = {
                     username: verified.username,
                 }
-
                 const jwtToken = jwt.sign(userData, env.parsed.PRIVATE_KEY, {
                     expiresIn: 60,
                 })
+                const user = await User.findOne({ username: verified.username })
 
-                res.status(200).json({
+                res.json({
                     newToken: jwtToken,
-                    username: userData.username,
+                    username: user.username,
+                    role: user.role,
                 })
             } else {
                 res.sendStatus(401)

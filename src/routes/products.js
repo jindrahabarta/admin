@@ -1,19 +1,43 @@
 import express from 'express'
 import { Product } from '../database/models.js'
 import { upload } from '../utils/cloudinary.js'
+import deleteImage from '../utils/deleteImage.js'
+import { isValidObjectId } from 'mongoose'
 
 const router = express.Router()
 
 router.get('/', async (req, res) => {
-    console.log(req.body)
-
     const products = await Product.find()
     res.send(products)
 })
 
+router.get('/search', async (req, res) => {
+    const { phrase, category } = req.query
+
+    let productsByCategory
+    if (category) {
+        productsByCategory = await Product.find({ categoryId: category })
+    } else {
+        productsByCategory = await Product.find()
+    }
+
+    const products = productsByCategory.filter((product) => {
+        if (product.productName.includes(phrase)) return product
+    })
+
+    if (products.length === 0) return res.sendStatus(204)
+
+    res.json(products)
+})
+
 router.get('/:id', async (req, res) => {
-    const id = req.params.id
-    const product = await Product.find({ _id: id })
+    const { id } = req.params
+
+    if (!isValidObjectId(id)) {
+        return res.send(400).send('Invalid id parameter')
+    }
+
+    const product = await Product.findById(id)
 
     res.json(product)
 })
@@ -22,8 +46,8 @@ router.post('/', upload.single('mainImage'), async (req, res) => {
     if (!req.file) {
         return res.status(400)
     }
-    const newProduct = new Product({
-        _id: crypto.randomUUID(),
+
+    await Product.create({
         productName: req.body.productName,
         desc: req.body.desc,
         categoryId: req.body.category,
@@ -31,49 +55,46 @@ router.post('/', upload.single('mainImage'), async (req, res) => {
         price: Number(req.body.price),
         imageUrl: req.file.path,
     })
-    await newProduct.save()
 
     res.sendStatus(200)
 })
 
 router.delete('/:id', async (req, res) => {
-    const id = req.params.id
+    try {
+        const id = req.params.id
 
-    const product = await Product.findOneAndDelete({ _id: id })
-
-    //TODO:Mazani obrazku tady a potom u PUT
-    // console.log(product.imageUrl)
-
-    // const testUrl = 's-l400.jpg-Novej%20prod'
-
-    // cloudinary.uploader.destroy(testUrl, function (error, result) {
-    //     if (error) {
-    //         return res.status(500).json({ message: 'Failed to delete image' })
-    //     }
-    //     console.log('Image deletion result:', result)
-    // })
-
-    res.sendStatus(200)
+        deleteImage(id)
+        await Product.findOneAndDelete({ _id: id })
+        res.sendStatus(200)
+    } catch (err) {
+        res.sendStatus(500)
+    }
 })
 
 router.put('/', upload.single('mainImage'), async (req, res) => {
-    let updatedProduct = {}
+    try {
+        let updatedProduct = {}
 
-    if (req.file) {
-        updatedProduct = {
-            imageUrl: req.file.path,
-            ...req.body,
+        if (req.file) {
+            deleteImage(req.body.id)
+
+            updatedProduct = {
+                imageUrl: req.file.path,
+                ...req.body,
+            }
+        } else {
+            updatedProduct = req.body
         }
-    } else {
-        updatedProduct = req.body
+
+        const product = await Product.findOneAndReplace(
+            { _id: req.body.id },
+            updatedProduct
+        )
+
+        res.send(product)
+    } catch (err) {
+        res.sendStatus(500)
     }
-
-    const product = await Product.findOneAndReplace(
-        { _id: req.body.id },
-        updatedProduct
-    )
-
-    res.send(product)
 })
 
 export default router

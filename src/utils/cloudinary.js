@@ -16,8 +16,21 @@ const storage = new CloudinaryStorage({
     params: {
         folder: 'productsImages',
         format: async () => 'png',
-        public_id: (req, file) =>
-            `${file.originalname}-${req.body.productName}`,
+        public_id: (req, file) => {
+            const originalName = file.originalname
+                .replaceAll(' ', '_')
+                .replace('.jpeg', '')
+                .replace('.png', '')
+                .replace('.jpg', '')
+                .replaceAll('.', '')
+                .toLowerCase()
+
+            const productName = req.body.productName
+                .replaceAll(' ', '_')
+                .replaceAll('.', '')
+
+            return `${originalName}-${productName}`
+        },
     },
 })
 

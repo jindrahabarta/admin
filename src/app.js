@@ -20,7 +20,11 @@ app.use(helmet())
 app.use(bodyParser.json())
 app.use(
     cors({
-        origin: ['http://localhost:5173', 'https://jh-todoapp.netlify.app'],
+        origin: [
+            'http://localhost:5173',
+            'https://jh-todoapp.netlify.app',
+            'https://jh-adminapp.netlify.app',
+        ],
         credentials: true,
     })
 )
